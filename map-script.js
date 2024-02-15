@@ -466,22 +466,20 @@ var MapApp = {
             this.map.getSource(layerId).setData(geoJSONData);
         }
     
-        // Add or update layer
+        // Add or update layer with visibility handled elsewhere
         if (!this.map.getLayer(layerId)) {
             this.map.addLayer({
                 id: layerId,
                 type: 'symbol',
                 source: layerId,
-                layout: { 'icon-image': iconId, 'icon-allow-overlap': true },
-                // Add this to control initial visibility
-                visibility: isVisible ? 'visible' : 'none',
+                layout: { 'icon-image': iconId, 'icon-allow-overlap': true }
             });
-        } else {
-            // Update visibility if layer already exists
-            this.map.setLayoutProperty(layerId, 'visibility', isVisible ? 'visible' : 'none');
+            // Check if the layer has been added and then set visibility
+            if (this.map.getLayer(layerId)) {
+                this.map.setLayoutProperty(layerId, 'visibility', isVisible ? 'visible' : 'none');
+            }
         }
-    },
-    
+    },    
     
     // Add more utility functions as needed...
 };
@@ -491,8 +489,19 @@ $(document).ready(function() {
     MapApp.initializeMap();
     MapApp.initializePopups();
 
-    // After map initialization, explicitly set layer visibility based on checkboxes
-    MapApp.addAllLayers(); // Now includes visibility checks
+    // Ensure all layers are added and initial visibility is set
+    MapApp.addAllLayers();
 
-    // Continue with checkbox change handlers as before
+    // Listen for changes in checkbox states and update layer visibility accordingly
+    $('#layerSwitcher input[type="checkbox"]').on('change', function() {
+        var layerId = $(this).attr('id');
+        var isChecked = $(this).is(':checked');
+
+        // Check if the corresponding layer exists
+        if (MapApp.map.getLayer(layerId)) {
+            // Set the layer visibility based on the checkbox state
+            MapApp.map.setLayoutProperty(layerId, 'visibility', isChecked ? 'visible' : 'none');
+        }
+    });
 });
+
