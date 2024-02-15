@@ -1,0 +1,10 @@
+iso3,pcode,gis_name,name_alt,loc_type,code_shipto,code_location,capacity_m3,occupancy,occupancy_date,lon,lat
+BGD,BGDw000054,Cox's Bazaar WH,null,Country Stock,BGDC1,BGDC3,null,null,null,91.985,21.439
+BGD,BGDw000062,Noakhal WH,UNHCR Noakhal Warehouse,Country Stock,null,BGDN1,null,null,null,91.3688,22.3654
+BGD,BGDw000059,Cox's Bazaar WH 4,UNHCR Cox's Bazaar Warehouse 4,Country Stock,BGDC6,BGDC6,null,null,null,92.162,21.2237
+BGD,BGDw000058,Cox's Bazaar WH 3,UNHCR Cox's Bazaar Warehouse 3,Country Stock,BGDC5,BGDC5,null,null,null,92.1456,21.2147
+BGD,BGDw000056,Cox's Bazaar WH (V),UNHCR Cox's Bazaar WH (V),Virtual Stock,BGDC4,BGDC4,null,null,1583020800000,91.985,21.439
+BGD,BGDw000060,Cox's Bazaar WH 6,UNHCR Cox's Bazaar Warehouse 6,Country Stock,null,BGDC8,null,null,null,92.17,21.2077
+BGD,BGDw000057,Cox's Bazaar WH 5,UNHCR Cox's Bazaar Warehouse 5,Country Stock,BGDC7,BGDC7,null,null,null,92.2565,21.9517
+BGD,BGDw000055,Chittagong WH,Chittagong WH,Country Stock,null,BGDC2,null,null,null,91.8104,22.3852
+BGD,BGDw000061,Cox's Bazaar WH 7,UNHCR Cox's Bazaar Warehouse 7,Country Stock,null,BGDC9,null,null,null,92.1377,21.1954

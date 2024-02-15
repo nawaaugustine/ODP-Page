@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Bangladesh country view</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .mapboxgl-ctrl-attrib-inner { display: none; }
+        #layerSwitcher {
+            position: absolute; top: 10px; right: 10px; padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8); border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 1;
+            font-family: Arial, sans-serif; font-size: 14px;
+            transition: background-color 0.3s ease;
+            display: flex; /* Use flexbox to align items */
+            flex-direction: column; /* Stack items vertically */
+            align-items: flex-start; /* Align items to the start of the flex container (left) */
+        }
+        
+        #layerSwitcher input[type="checkbox"] {
+            margin-right: 5px;
+            cursor: pointer; /* Add pointer cursor to checkboxes */
+        }
+        
+        #layerSwitcher label {
+            cursor: pointer;
+            display: flex; /* Use flexbox for label alignment */
+            align-items: center; /* Vertically center items within label */
+            margin: 5px 0; /* Add some vertical spacing between labels */
+        }
+        
+        #layerSwitcher label input[type="checkbox"],
+        #layerSwitcher label svg {
+            flex-shrink: 0; /* Prevent checkbox and SVG from shrinking */
+        }
+
+        #layerSwitcher label span {
+            margin-left: 5px; /* Space between the SVG and the text */
+        }
+        
+        /* Style for the legend circles to ensure proper alignment */
+        #layerSwitcher label svg circle {
+            pointer-events: none; /* Disable pointer events for SVG circles */
+        }
+  
+    </style>
+</head>
+<body>
+    <div id="map">
+        <div id="layerSwitcher">
+            <label for="warehouses">
+                <input type="checkbox" id="warehouses" checked>
+                <img src="./icons/warehouse.png" alt="Warehouse Icon" height="12" width="10">
+                <span>Warehouses</span>
+            </label><br>
+            
+            <label for="poc-layer">
+                <input type="checkbox" id="poc-layer" checked>
+                <img src="./icons/location.png" alt="Point of Concern Icon" height="12" width="10">
+                <span>Refugees Location</span>
+            </label><br>
+            
+            <label for="presence-layer">
+                <input type="checkbox" id="presence-layer" checked>
+                <img src="./icons/un_office.png" alt="Presence Icon" height="12" width="10">
+                <span>Presence</span>
+            </label><br>
+            
+            <label for="ref">
+                <!-- <input type="checkbox" id="ref" checked> -->
+                <svg height="22" width="25"><circle cx="12" cy="15" r="7" fill="#0072BC" /></svg>
+                <span>Refugee Population in Cox's Bazar</span>
+            </label><br>
+
+            <label for="ref">
+                <!--  <input type="checkbox" id="ref-bhasan" checked> -->
+                <svg height="22" width="25"><circle cx="12" cy="15" r="7" fill="#EF4A60" /></svg>
+                <span>Refugee Population in Bhasan Char</span>
+            </label><br>
+        </div>
+        
+    </div>
+    <script src="map-script.js"></script>
+</body>
+</html>
