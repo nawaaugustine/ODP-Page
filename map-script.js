@@ -437,14 +437,14 @@ var MapApp = {
             this.loadDataPromise('./data/BGD_prp_p_unhcr_PoC.csv.csv', 12, 13, 2),
             this.loadDataPromise('./data/BGD_marker_presence_p_unhcr.csv.csv', 14, 15, 2)
         ]).then(([warehousesData, pocData, presenceData]) => {
-            // Data for all layers is now loaded, add the layers to the map
-            this.addLayerForData(warehousesData, 'warehouses', 'warehouse-icon');
-            this.addLayerForData(pocData, 'poc-layer', 'poc-icon');
-            this.addLayerForData(presenceData, 'presence-layer', 'presence-icon');
+            // Conditionally add layers based on checkbox state
+            this.addLayerForData(warehousesData, 'warehouses', 'warehouse-icon', $('#warehouses').is(':checked'));
+            this.addLayerForData(pocData, 'poc-layer', 'poc-icon', $('#poc-layer').is(':checked'));
+            this.addLayerForData(presenceData, 'presence-layer', 'presence-icon', $('#presence-layer').is(':checked'));
         }).catch(error => {
             console.error('Error loading data for layers:', error);
         });
-    },
+    },    
     
     loadDataPromise: function(filePath, lonIndex, latIndex, nameIndex) {
         return new Promise((resolve, reject) => {
@@ -458,54 +458,41 @@ var MapApp = {
         });
     },
 
-    addLayerForData: function(geoJSONData, layerId, iconId) {
-        // First, ensure that the map source for the given layerId does not already exist.
+    addLayerForData: function(geoJSONData, layerId, iconId, isVisible) {
+        // Add or update source
         if (!this.map.getSource(layerId)) {
-            // If the source does not exist, add a new source with the provided GeoJSON data.
-            this.map.addSource(layerId, {
-                type: 'geojson',
-                data: geoJSONData
-            });
+            this.map.addSource(layerId, { type: 'geojson', data: geoJSONData });
         } else {
-            // If the source already exists, update its data.
             this.map.getSource(layerId).setData(geoJSONData);
         }
     
-        // Next, check if the layer already exists to avoid adding it twice.
+        // Add or update layer
         if (!this.map.getLayer(layerId)) {
-            // Add the layer to the map with the specified properties.
             this.map.addLayer({
                 id: layerId,
-                type: 'symbol', // This type is used for layers that represent points with icons.
-                source: layerId, // This references the source we added/updated above.
-                layout: {
-                    // Here, you specify how the icons should be displayed.
-                    'icon-image': iconId, // This is the ID of the icon image previously loaded.
-                    //'icon-size': 2, // Adjusts the size of the icon. This value can be tweaked as needed.
-                    'icon-allow-overlap': true, // This allows icons to overlap, useful in densely populated areas.
-                }
+                type: 'symbol',
+                source: layerId,
+                layout: { 'icon-image': iconId, 'icon-allow-overlap': true },
+                // Add this to control initial visibility
+                visibility: isVisible ? 'visible' : 'none',
             });
         } else {
-            // Log a warning if the layer already exists, as re-adding it may indicate a logical flaw in your application's flow.
-            console.warn(`Layer with id ${layerId} already exists.`);
+            // Update visibility if layer already exists
+            this.map.setLayoutProperty(layerId, 'visibility', isVisible ? 'visible' : 'none');
         }
     },
+    
     
     // Add more utility functions as needed...
 };
 
+// After the map and layers have been initialized
 $(document).ready(function() {
     MapApp.initializeMap();
     MapApp.initializePopups();
 
-    // Toggle layer visibility based on checkbox state
-    $('#layerSwitcher input[type="checkbox"]').on('change', function() {
-        var layerId = $(this).attr('id');
-        var visibility = $(this).is(':checked') ? 'visible' : 'none';
+    // After map initialization, explicitly set layer visibility based on checkboxes
+    MapApp.addAllLayers(); // Now includes visibility checks
 
-        // Ensure the layer exists before trying to change its visibility
-        if (MapApp.map.getLayer(layerId)) {
-            MapApp.map.setLayoutProperty(layerId, 'visibility', visibility);
-        }
-    });
+    // Continue with checkbox change handlers as before
 });
