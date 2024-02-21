@@ -174,7 +174,7 @@ var MapApp = {
         let clusterColorExpression = [
             'step',
             ['get', 'point_count'],
-            layerId === 'ref' ? '#EF4A60' : '#00B398', 100, // Color for clusters with up to 100 points
+            layerId === 'ref' ? '#0072BC' : '#00B398', 100, // Color for clusters with up to 100 points
             '#f1f075', 750, // Color for clusters with up to 750 points
             '#f28cb1' // Color for clusters with more than 750 points
         ];
@@ -222,8 +222,8 @@ var MapApp = {
         let individualPointColorExpression = [
             'match',
             ['get', 'name'], // Checking the 'name' property
-            'Bhasan Char', '#0072BC', // Specific color for 'Bhasan Char'
-            layerId === 'ref' ? '#EF4A60' : '#00B398' // Default color based on layerId
+            'Bhasan Char', '#EF4A60', // Specific color for 'Bhasan Char'
+            layerId === 'ref' ? '#0072BC' : '#00B398' // Default color based on layerId
         ];
 
         let individualPointSizeExpression = [
@@ -319,7 +319,7 @@ var MapApp = {
 
         // Initialize popups for each layer that requires them
         //this.setupPopupForLayer('ref_bhasan', '#00B398', 'Refugee Population 1');
-        this.setupPopupForLayer('ref', '#EF4A60', 'Refugee Population');
+        this.setupPopupForLayer('ref', '#0072BC', 'Refugee Population');
 
         // Setup popup for the warehouses layer
         var self = this; // Reference to the MapApp object for use in closures
@@ -351,7 +351,7 @@ var MapApp = {
     setupPopupForLayer: function(layerId, defaultColor, label) {
         this.map.on('click', `${layerId}-unclustered-point`, (e) => {
             var coordinates = e.features[0].geometry.coordinates.slice();
-            var color = e.features[0].properties.name === 'Bhasan Char' ? '#0072BC' : defaultColor;
+            var color = e.features[0].properties.name === 'Bhasan Char' ? '#EF4A60' : defaultColor;
             var description = `<b>${e.features[0].properties.name}</b><br><b style="color:${color}">${this.numberWithCommas(e.features[0].properties.value)}</b> ${label}`;
     
             // Ensure the popup points to the correct location
