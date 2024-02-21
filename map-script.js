@@ -13,12 +13,20 @@ var MapApp = {
             container: 'map',
             style: 'mapbox://styles/unhcr/clbaspvlx008p14nwrwo06ox6',
             center: [91.1398552, 22.9336065],
-            zoom: 3,
+            zoom: 5,
             projection: 'globe'
         });
         
         this.map.on('load', () => {
-            this.map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+
+            if (this.map.getZoom() < 5) {
+                this.map.setLayoutProperty('country-label', 'visibility', 'none');
+            } else {
+                this.map.setLayoutProperty('country-label', 'visibility', 'visible');
+            }
+
+            this.updateFacilitiesCheckboxVisibility();
+
             this.map.setLights([{
                 "id": "sun_light",
                 "type": "directional",
@@ -44,6 +52,7 @@ var MapApp = {
             this.loadAllImages(); // First, load all images
             this.loadAllCSVs(); // Then, load all CSV data
             this.addAllLayers(); // Finally, add all layers
+            this.map.on('zoom', () => this.updateFacilitiesCheckboxVisibility());
         });
 
         // Inside initializeMap or after map is fully loaded
@@ -64,6 +73,19 @@ var MapApp = {
         this.map.on('mouseenter', 'ref-clusters', () => this.map.getCanvas().style.cursor = 'pointer');
         this.map.on('mouseleave', 'ref-clusters', () => this.map.getCanvas().style.cursor = '');
     },
+
+    updateFacilitiesCheckboxVisibility: function() {
+        const currentZoom = this.map.getZoom();
+        const visibility = currentZoom >= 15 ? 'visible' : 'none'; // Determine visibility based on zoom level
+    
+        // Set the visibility of the facilities layer directly
+        if (this.map.getLayer('facility-layer')) {
+            this.map.setLayoutProperty('facility-layer', 'visibility', visibility);
+        }
+    
+        // Optionally, update the checkbox state to reflect the layer visibility
+        $('#facility-layer').prop('checked', visibility === 'visible');
+    },    
 
     addNavigationControl: function() {
         var nav = new mapboxgl.NavigationControl();
@@ -361,7 +383,7 @@ var MapApp = {
     loadAllCSVs: function() {
         const csvFiles = [
             { path: './data/BGD_marker_warehouse_p_unhcr.csv.csv', lonIndex: 10, latIndex: 11, nameIndex: 2, dataKey: 'warehousesData' },
-            { path: './data/BGD_prp_p_unhcr_PoC.csv.csv', lonIndex: 12, latIndex: 13, nameIndex: 2, dataKey: 'pocData' },
+            { path: './data/Facility_Map.csv', lonIndex: 6, latIndex: 5, nameIndex: 8, dataKey: 'facilityData' },
             { path: './data/BGD_marker_presence_p_unhcr.csv.csv', lonIndex: 14, latIndex: 15, nameIndex: 2, dataKey: 'presenceData' }
         ];
     
@@ -375,57 +397,55 @@ var MapApp = {
         });
     },
 
-    csvToGeoJSON: function(csvText, lonIndex, latIndex, nameIndex) {
-        // Split the CSV text into lines
+    csvToGeoJSON: function(csvText, lonIndex, latIndex, nameIndex, typeIndex = 7) {
         const lines = csvText.trim().split('\n');
-        // Prepare an empty GeoJSON FeatureCollection object
         const geoJSON = {
             type: 'FeatureCollection',
             features: []
         };
     
-        // Skip the header line (i.e., start from index 1) and iterate over each line
         for (let i = 1; i < lines.length; i++) {
             const columns = lines[i].split(',');
+            const longitude = parseFloat(columns[lonIndex]);
+            const latitude = parseFloat(columns[latIndex]);
+            const name = columns[nameIndex];
+            const type = columns[typeIndex]; // Extract the facility type
     
-            // Ensure that the row has enough columns
-            if (columns.length > Math.max(lonIndex, latIndex, nameIndex)) {
-                const longitude = parseFloat(columns[lonIndex]);
-                const latitude = parseFloat(columns[latIndex]);
-                const name = columns[nameIndex];
-    
-                // Only add the feature if longitude and latitude are valid numbers
-                if (!isNaN(longitude) && !isNaN(latitude)) {
-                    const feature = {
-                        type: 'Feature',
-                        properties: {
-                            name: name // Use the name or adjust this to include other properties as needed
-                        },
-                        geometry: {
-                            type: 'Point',
-                            coordinates: [longitude, latitude]
-                        }
-                    };
-                    geoJSON.features.push(feature);
-                }
+            if (!isNaN(longitude) && !isNaN(latitude)) {
+                const feature = {
+                    type: 'Feature',
+                    properties: {
+                        name: name,
+                        type: type // Include the facility type in properties
+                    },
+                    geometry: {
+                        type: 'Point',
+                        coordinates: [longitude, latitude]
+                    }
+                };
+                geoJSON.features.push(feature);
             }
         }
     
         return geoJSON;
     },
-    
 
     loadAllImages: function() {
         const images = [
             { id: 'warehouse-icon', path: './icons/warehouse-icon.png' },
-            { id: 'poc-icon', path: './icons/poc-icon.png' },
-            { id: 'presence-icon', path: './icons/presence-icon.png' }
+            { id: 'facilities', path: './icons/facilities.png' },
+            { id: 'unhcr', path: './icons/unhcr.png' },
+            { id: 'education-icon', path: './icons/education-icon.png' },
+            { id: 'health-icon', path: './icons/health-icon.png' },
+            { id: 'protection-icon', path: './icons/protection-icon.png' },
         ];
     
         images.forEach(img => {
             this.map.loadImage(img.path, (error, image) => {
                 if (error) throw error;
-                this.map.addImage(img.id, image);
+                if (!this.map.hasImage(img.id)) { // Check to avoid reloading images
+                    this.map.addImage(img.id, image);
+                }
             });
         });
     },
@@ -434,13 +454,13 @@ var MapApp = {
         // Ensure all data is loaded before adding layers
         Promise.all([
             this.loadDataPromise('./data/BGD_marker_warehouse_p_unhcr.csv.csv', 10, 11, 2),
-            this.loadDataPromise('./data/BGD_prp_p_unhcr_PoC.csv.csv', 12, 13, 2),
+            this.loadDataPromise('./data/Facility_Map.csv', 6, 5, 8),
             this.loadDataPromise('./data/BGD_marker_presence_p_unhcr.csv.csv', 14, 15, 2)
-        ]).then(([warehousesData, pocData, presenceData]) => {
+        ]).then(([warehousesData, facilityData, presenceData]) => {
             // Conditionally add layers based on checkbox state
             this.addLayerForData(warehousesData, 'warehouses', 'warehouse-icon', $('#warehouses').is(':checked'));
-            this.addLayerForData(pocData, 'poc-layer', 'poc-icon', $('#poc-layer').is(':checked'));
-            this.addLayerForData(presenceData, 'presence-layer', 'presence-icon', $('#presence-layer').is(':checked'));
+            this.addLayerForData(facilityData, 'facility-layer', 'facilities', $('#facility-layer').is(':checked'));
+            this.addLayerForData(presenceData, 'presence-layer', 'unhcr', $('#presence-layer').is(':checked'));
         }).catch(error => {
             console.error('Error loading data for layers:', error);
         });
@@ -468,12 +488,32 @@ var MapApp = {
     
         // Add or update layer with visibility handled elsewhere
         if (!this.map.getLayer(layerId)) {
-            this.map.addLayer({
-                id: layerId,
-                type: 'symbol',
-                source: layerId,
-                layout: { 'icon-image': iconId, 'icon-allow-overlap': true }
-            });
+            if(layerId != 'facility-layer') {
+                this.map.addLayer({
+                    id: layerId,
+                    type: 'symbol',
+                    source: layerId,
+                    layout: { 'icon-image': iconId, 'icon-allow-overlap': true }
+                });
+            }
+            else{
+                this.map.addLayer({
+                    id: layerId,
+                    type: 'symbol',
+                    source: layerId,
+                    layout: {
+                        'icon-image': [
+                            'match',
+                            ['get', 'type'],
+                            'Education', 'education-icon',
+                            'Health', 'health-icon',
+                            'Protection', 'protection-icon',
+                            'facilities' // Fallback icon
+                        ],
+                        'icon-allow-overlap': true
+                    }
+                });
+            }
             // Check if the layer has been added and then set visibility
             if (this.map.getLayer(layerId)) {
                 this.map.setLayoutProperty(layerId, 'visibility', isVisible ? 'visible' : 'none');

@@ -1,3 +1,4 @@
 iso3,pcode,gis_name,name_alt,name_fr,name_sp,loc_type,address_1,address_2,address_3,address_4,city,ds_code,msrp_sp_id,lon,lat
 BGD,BGDp000034,Dhaka,null,Dacca,null,Country Office,P.O. Box 3474,House N/E (N) 8,null,null,Dhaka,BGDDA,BGDDA,90.4158,23.7989
 BGD,BGDp000033,Cox's Bazar,Cox's Bazaar,Cox's Bazar,null,Sub-Office,New Cottage,Motel Road,null,null,Cox's Bazaar,BGDCO,BGDCO,91.985,21.439
+BGD,BGDp000032,Bhasan Char,null,Bhadan Char,null,Sub-Office,New Cottage,Motel Road,null,null,Cox's Bazaar,BGDCO,BGDCO,91.37485857,22.36500098
