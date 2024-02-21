@@ -3,7 +3,7 @@ var MapApp = {
     mapboxToken: 'pk.eyJ1IjoidW5oY3IiLCJhIjoiY2xhdGVmdjBoMDAwaTN3cDh4M2swdWMydyJ9.cYfxlbJadmlPsmnoincZsw',
     map: null,
     layerData: {
-        ref: { url: "https://data.unhcr.org/population/get/sublocation/root?widget_id=446020&geo_id=591&population_group=5556&forcesublocation=true&fromDate=1900-01-01", data: null, maxVal: 0 },
+        ref: { url: "https://data.unhcr.org/population/get/sublocation?geo_id=591&forcesublocation=1&sv_id=0&population_group=5556,5557", data: null, maxVal: 0 },
         //ref_bhasan: { url: "https://data.unhcr.org/population/?widget_id=446025&geo_id=591&population_group=5553", data: null, maxVal: 0 }
     },
 
